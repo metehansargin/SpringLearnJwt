@@ -1,5 +1,6 @@
 package com.metehansargin.jwt.config;
 
+import com.metehansargin.jwt.exception.BaseException;
 import com.metehansargin.jwt.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +28,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws BaseException {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request->
                         request.requestMatchers(AUTHENTICE,REGISTER).permitAll()

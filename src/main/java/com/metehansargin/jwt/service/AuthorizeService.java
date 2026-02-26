@@ -2,6 +2,9 @@ package com.metehansargin.jwt.service;
 
 import com.metehansargin.jwt.dto.DtoUser;
 import com.metehansargin.jwt.entity.User;
+import com.metehansargin.jwt.exception.BaseException;
+import com.metehansargin.jwt.exception.ErrorMessage;
+import com.metehansargin.jwt.exception.MessageType;
 import com.metehansargin.jwt.jwt.AuthRequest;
 import com.metehansargin.jwt.jwt.AuthResponse;
 import com.metehansargin.jwt.jwt.JwtService;
@@ -53,9 +56,8 @@ public class AuthorizeService {
 
             return new AuthResponse(token);
         }catch (Exception e){
-            System.out.println("Kullanici veya sifre yanlis...");
+           throw new BaseException(new ErrorMessage(MessageType.NO_USER,e.getMessage()));
         }
-        return null;
     }
 
 }

@@ -1,6 +1,9 @@
 package com.metehansargin.jwt.jwt;
 
 
+import com.metehansargin.jwt.exception.BaseException;
+import com.metehansargin.jwt.exception.ErrorMessage;
+import com.metehansargin.jwt.exception.MessageType;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -51,10 +54,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     }
                 }
             }catch (ExpiredJwtException e){
-                System.out.println("Token Expired..."+e.getMessage());
+                throw  new BaseException(new ErrorMessage(MessageType.TOKEN_EXPIRED,e.getMessage()));
             }catch (Exception e){
-                System.out.println("General one exception ..."+e.getMessage());
-                SecurityContextHolder.clearContext();
+                throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,e.getMessage()));
             }
             filterChain.doFilter(request,response);
     }

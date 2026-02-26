@@ -4,6 +4,9 @@ import com.metehansargin.jwt.dto.DtoDepartment;
 import com.metehansargin.jwt.dto.DtoEmployee;
 import com.metehansargin.jwt.entity.Department;
 import com.metehansargin.jwt.entity.Employee;
+import com.metehansargin.jwt.exception.BaseException;
+import com.metehansargin.jwt.exception.ErrorMessage;
+import com.metehansargin.jwt.exception.MessageType;
 import com.metehansargin.jwt.repository.EmployeeRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -25,7 +28,7 @@ public class EmployeeService {
         Optional<Employee> optionalEmployee=employeeRepository.findById(id);
 
         if (optionalEmployee.isEmpty()){
-            return null;
+            throw new BaseException(new ErrorMessage(MessageType.NO_EMPLOYEE,id.toString()));
         }
         Employee employee=optionalEmployee.get();
         Department department=optionalEmployee.get().getDepartment();
