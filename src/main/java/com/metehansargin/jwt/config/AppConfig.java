@@ -2,11 +2,9 @@ package com.metehansargin.jwt.config;
 
 import com.metehansargin.jwt.repository.UserRepository;
 import com.metehansargin.jwt.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,8 +16,11 @@ import java.util.Optional;
 
 @Configuration
 public class AppConfig {
-    @Autowired
     private UserRepository userRepository;
+
+    public AppConfig(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Bean
     public UserDetailsService userDetailsService(){
@@ -30,7 +31,8 @@ public class AppConfig {
                 if (optionalUser.isPresent()){
                     return optionalUser.get();
                 }
-                return null;
+                return userRepository.findByUsername(username)
+                        .orElseThrow(()->new UsernameNotFoundException("User bulunamadi"));
             }
         };
     }
