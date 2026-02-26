@@ -10,7 +10,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,11 +21,13 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    @Autowired
     private JwtService jwtService;
-
-    @Autowired
     private UserDetailsService userDetailsService;
+
+    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -54,9 +55,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     }
                 }
             }catch (ExpiredJwtException e){
-                throw  new BaseException(new ErrorMessage(MessageType.TOKEN_EXPIRED,e.getMessage()));
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+
+                String json = """
+        {
+            "status": 401,
+            "error": "TOKEN_EXPIRED",
+            "message": "Token süresi doldu"
+        }
+        """;
+
+                response.getWriter().write(json);
+                response.getWriter().flush();
+                return;
             }catch (Exception e){
-                throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,e.getMessage()));
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+
+                String json = """
+        {
+            "status": 401,
+            "error": "GENERAL_EXCEPTION",
+            "message": "Geçersiz token"
+        }
+        """;
+
+                response.getWriter().write(json);
+                response.getWriter().flush();
+                return;
             }
             filterChain.doFilter(request,response);
     }
