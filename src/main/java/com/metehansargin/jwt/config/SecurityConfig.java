@@ -1,6 +1,7 @@
 package com.metehansargin.jwt.config;
 
 import com.metehansargin.jwt.exception.BaseException;
+import com.metehansargin.jwt.jwt.AuthEntryPoint;
 import com.metehansargin.jwt.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,19 +22,23 @@ public class SecurityConfig {
 
     private AuthenticationProvider authenticationProvider;
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private AuthEntryPoint authEntryPoint;
 
-    public SecurityConfig(AuthenticationProvider authenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(AuthenticationProvider authenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter,AuthEntryPoint authEntryPoint) {
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.authEntryPoint=authEntryPoint;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws BaseException {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request->
-                        request.requestMatchers(AUTHENTICE,REGISTER).permitAll()
+                        request.requestMatchers(AUTHENTICE,REGISTER)
+                                .permitAll()
                                 .anyRequest()
                                 .authenticated())
+                .exceptionHandling(exception->exception.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
